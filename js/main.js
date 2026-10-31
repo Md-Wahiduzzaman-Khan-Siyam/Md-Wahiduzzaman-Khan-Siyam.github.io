@@ -54,6 +54,27 @@ function setupContactForm() {
   };
 }
 
+function setupResumeDownload() {
+  $$('[data-resume-download]').forEach(link => link.addEventListener('click', async e => {
+    e.preventDefault();
+    try {
+      const response = await fetch(link.href);
+      if (!response.ok) throw new Error(`Resume download failed: ${response.status}`);
+      const url = URL.createObjectURL(await response.blob());
+      const download = document.createElement('a');
+      download.href = url;
+      download.download = link.download;
+      document.body.append(download);
+      download.click();
+      download.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      console.error(error);
+      location.href = link.href;
+    }
+  }));
+}
+
 setupThemeToggle();
 setupMobileMenu();
 setupTypingAnimation();
@@ -61,4 +82,5 @@ setupRevealAnimations();
 setupActiveNavigation();
 setupCertificateLightbox();
 setupContactForm();
+setupResumeDownload();
 $('#yr').textContent = new Date().getFullYear();
